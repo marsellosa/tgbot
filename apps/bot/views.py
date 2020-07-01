@@ -4,15 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import  APIView
 from .models import User
 # Create your views here.
-
+TOKEN = os.environ.get('TOKEN')
 import telebot
 
-bot = telebot.TeleBot('1075118916:AAHzfQf_rgPdS7uAiQ-Z12Az1rmjldQj9WE')
-
-'''
-https://api.telegram.org/bot1075118916:AAHzfQf_rgPdS7uAiQ-Z12Az1rmjldQj9WE/setWebhook?url=https://b5d8f52b57aa.ngrok.io/bot1075118916:AAHzfQf_rgPdS7uAiQ-Z12Az1rmjldQj9WE/
-
-'''
+bot = telebot.TeleBot(TOKEN)
 
 class UpdateBot(APIView):
     def post(self,request):
