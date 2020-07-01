@@ -11,6 +11,9 @@ gunicorn = "*"
 dj-database-url = "*"
 django-crispy-forms = "*"
 pillow = "*"
+whitenoise = "*"
+django-rest-framework = "*"
+pytelegrambotapi = "*"
 
 [requires]
 python_version = "3.6"
