@@ -1,1 +1,1 @@
-web: gunicorn tgbot.wsgi
+web: gunicorn tgbot.wsgi --log-file -
