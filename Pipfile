@@ -15,7 +15,6 @@ whitenoise = "*"
 django-rest-framework = "*"
 pytelegrambotapi = "*"
 psycopg2 = "*"
-decouple = "*"
 python-decouple = "*"
 
 [requires]
