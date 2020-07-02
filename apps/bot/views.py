@@ -18,7 +18,7 @@ class UpdateBot(APIView):
         return Response({'code': 200})
 
 
-@bot.message_handler(commands=['/ayuda'])
+@bot.message_handler(commands=['ayuda'])
 def start(message):
     msg = """
         Hola! Yo soy tu asistente, y\n
