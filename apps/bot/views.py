@@ -21,14 +21,26 @@ class UpdateBot(APIView):
 @bot.message_handler(commands=['ayuda'])
 def start(message):
     msg = """
-        Hola! Yo soy tu asistente, y\n
-        puedo ayudarte con la lista\n
-        de precios de los productos\n
-        HERBALIFE NUTRITION en Bolivia.\n
-        Uso:\n
-        /batido\n
-        /aloe\n
-        /te\n
+    Hola! Yo soy tu asistente, y
+    puedo ayudarte con la lista
+    de precios de los productos
+    HERBALIFE NUTRITION en Bolivia.
+    Uso:
+    /batido
+    /aloe
+    /te
+    /nrg
+    /chai
+    """
+    bot.send_message(message.chat.id,msg)
+
+
+@bot.message_handler(commands=['batido'])
+def batido(message):
+    msg="""
+    Batido:
+    PV: 24.32
+    25%: 32.30$us - 225 Bs.
     """
     bot.send_message(message.chat.id,msg)
 
