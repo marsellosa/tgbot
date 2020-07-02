@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '0rk8u5wk=gav4dn@mw^p@c22-j^_gcg6s@-=j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['mi-asistente-herbalife.herokuapp.com']
 
 
 # Application definition
