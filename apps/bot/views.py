@@ -18,9 +18,19 @@ class UpdateBot(APIView):
         return Response({'code': 200})
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['/ayuda'])
 def start(message):
-    bot.send_message(message.chat.id,'Hello')
+    msg = """
+        Hola! Yo soy tu asistente, y\n
+        puedo ayudarte con la lista\n
+        de precios de los productos\n
+        HERBALIFE NUTRITION en Bolivia.\n
+        Uso:\n
+        /batido\n
+        /aloe\n
+        /te\n
+    """
+    bot.send_message(message.chat.id,msg)
 
 
 @bot.message_handler(content_types='text')

@@ -28,9 +28,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '0rk8u5wk=gav4dn@mw^p@c22-j^_gcg6s@-=j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mi-asistente-herbalife.herokuapp.com']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -77,25 +74,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tgbot.wsgi.application'
 
-
+if DEBUG:
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+    ALLOWED_HOSTS = ['*']
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+else:
+    import dj_database_url
+    from decouple import config
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-import dj_database_url
-from decouple import config
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default = config('DATABASE_URL')
-    )
-}
+    ALLOWED_HOSTS = ['mi-asistente-herbalife.herokuapp.com']
+    DATABASES = {
+        'default': dj_database_url.config(
+            default = config('DATABASE_URL')
+        )
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
