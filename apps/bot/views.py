@@ -1,13 +1,17 @@
-import os
-
+# import os
+from decouple import config
 from rest_framework.response import Response
 from rest_framework.views import  APIView
 from .models import User
+from ..registros.productos.models import Categoria
 # Create your views here.
-TOKEN = os.environ.get('TOKEN')
-import telebot
+# TOKEN = config('TOKEN')
+# print(TOKEN)
 
-bot = telebot.TeleBot(TOKEN)
+import telebot
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
+bot = telebot.TeleBot(config('TOKEN'))
 
 class UpdateBot(APIView):
     def post(self,request):
@@ -19,20 +23,42 @@ class UpdateBot(APIView):
 
 
 @bot.message_handler(commands=['ayuda'])
-def start(message):
-    msg = """
-    Hola! Yo soy tu asistente, y
-    puedo ayudarte con la lista
-    de precios de los productos
-    HERBALIFE NUTRITION en Bolivia.
-    Uso:
-    /batido
-    /aloe
-    /te
-    /nrg
-    /chai
-    """
-    bot.send_message(message.chat.id,msg)
+def ayuda(message):
+    cols = 2
+    impar = False
+    key = ReplyKeyboardMarkup(row_width=cols, resize_keyboard=True, one_time_keyboard=True)
+    queryset = Categoria.objects.filter(activo=True)
+    nro_items = queryset.count()
+    vueltas = int(nro_items//cols)
+    if nro_items%cols > 0:
+        impar = True
+
+    i = 0
+    for _ in range(vueltas):
+        btn_izq = str(queryset[i])
+        i += 1
+        btn_der = str(queryset[i])
+        key.row(btn_izq, btn_der)
+        i += 1
+
+    if impar:
+        key.row(str(queryset[i]))
+
+    #     for _ in range(col):
+
+    # for e in queryset:
+    #     botones.append(KeyboardButton(e.nombre))
+    #     a = [['**a**', 'b', 'c']]
+    #     button = KeyboardButton(e.nombre)
+    #     puntos = KeyboardButton(e.puntos_volumen)
+    #     mayorista = KeyboardButton(e.mayorista)
+    #     key.row(button)
+    # key.row(botones)
+    # key = ReplyKeyboardMarkup([['a', 'b', 'c']])
+    
+    # print(botones)
+    msg = "Esta es la lista de productos que tengo de Bolivia"
+    bot.send_message(message.chat.id, msg, reply_markup=key)
 
 
 @bot.message_handler(commands=['batido'])
@@ -48,12 +74,16 @@ def batido(message):
 @bot.message_handler(content_types='text')
 def send_Message(message):
     user_id = message.chat.id
-    nombre = message.chat.first_name
+    nombre = message.chat.first_name if not None else '!'
     text = message.text
- 
-    # msg = f'Hola {nombre},\ngusto de saludarte otra vez!\n ¿Cómo puedo ayudarte?'
     msg = text
-
+    try:
+        producto = Categoria.objects.get(nombre__iexact=text)
+        dist = float(producto.distribuidor) * 6.96
+        msg = f"""{producto.descripcion}:\nCantidad: {producto.cantidad}\nPV: {producto.puntos_volumen}\n25%: {producto.distribuidor} $us | {dist:5.1f} Bs.\n35%: {producto.consultor_mayor} $us\n42%: {producto.productor_calificado} $us\n50%: {producto.mayorista} $us\nCliente:\nBs:"""
+    except:
+        pass
+    
     if not User.objects.filter(user_id=user_id).exists():
         user = User()        
         user.user_id = message.chat.id
