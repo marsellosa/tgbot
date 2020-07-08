@@ -4,9 +4,6 @@ from rest_framework.response import Response
 from rest_framework.views import  APIView
 from .models import User
 from ..registros.productos.models import Categoria
-# Create your views here.
-# TOKEN = config('TOKEN')
-# print(TOKEN)
 
 import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
@@ -25,65 +22,33 @@ class UpdateBot(APIView):
 @bot.message_handler(commands=['ayuda'])
 def ayuda(message):
     cols = 2
-    impar = False
     key = ReplyKeyboardMarkup(row_width=cols, resize_keyboard=True, one_time_keyboard=True)
     queryset = Categoria.objects.filter(activo=True)
     nro_items = queryset.count()
     vueltas = int(nro_items//cols)
-    if nro_items%cols > 0:
-        impar = True
+    impar = True if nro_items%cols > 0 else False
 
     i = 0
     for _ in range(vueltas):
         btn_izq = str(queryset[i])
         i += 1
         btn_der = str(queryset[i])
-        key.row(btn_izq, btn_der)
         i += 1
+        key.row(btn_izq, btn_der)
 
     if impar:
         key.row(str(queryset[i]))
 
-    #     for _ in range(col):
-
-    # for e in queryset:
-    #     botones.append(KeyboardButton(e.nombre))
-    #     a = [['**a**', 'b', 'c']]
-    #     button = KeyboardButton(e.nombre)
-    #     puntos = KeyboardButton(e.puntos_volumen)
-    #     mayorista = KeyboardButton(e.mayorista)
-    #     key.row(button)
-    # key.row(botones)
-    # key = ReplyKeyboardMarkup([['a', 'b', 'c']])
-    
-    # print(botones)
     msg = "Esta es la lista de productos que tengo de Bolivia"
     bot.send_message(message.chat.id, msg, reply_markup=key)
 
-
-@bot.message_handler(commands=['batido'])
-def batido(message):
-    msg="""
-    Batido:
-    PV: 24.32
-    25%: 32.30$us - 225 Bs.
-    """
-    bot.send_message(message.chat.id,msg)
-
-
 @bot.message_handler(content_types='text')
 def send_Message(message):
+    tc = 6.96
     user_id = message.chat.id
     nombre = message.chat.first_name if not None else '!'
-    text = message.text
-    msg = text
-    try:
-        producto = Categoria.objects.get(nombre__iexact=text)
-        dist = float(producto.distribuidor) * 6.96
-        msg = f"""{producto.descripcion}:\nCantidad: {producto.cantidad}\nPV: {producto.puntos_volumen}\n25%: {producto.distribuidor} $us | {dist:5.1f} Bs.\n35%: {producto.consultor_mayor} $us\n42%: {producto.productor_calificado} $us\n50%: {producto.mayorista} $us\nCliente:\nBs:"""
-    except:
-        pass
-    
+    msg = f'Hola {nombre}!, usa el link /ayuda, para tener mas información'
+
     if not User.objects.filter(user_id=user_id).exists():
         user = User()        
         user.user_id = message.chat.id
@@ -92,8 +57,20 @@ def send_Message(message):
         user.username = message.chat.username
         user.save()
 
-        msg = f'Hola {nombre}!, ¿Cómo puedo ayudarte?'
-
+        
+    text = message.text
+    # new_member = message.new_chat_members
+    # print(message)
+    # msg = text
+    try:
+        producto = Categoria.objects.get(nombre__iexact=text)
+        dist = float(producto.distribuidor) * tc
+        cons = float(producto.consultor_mayor) * tc
+        prod = float(producto.productor_calificado) * tc
+        mayo = float(producto.mayorista) * tc
+        msg = f"""{producto.descripcion}:\nCantidad: {producto.cantidad}\nPV: {producto.puntos_volumen}\n25%: {producto.distribuidor} $us | {dist:5.1f} Bs.\n35%: {producto.consultor_mayor} $us | {cons:5.1f} Bs.\n42%: {producto.productor_calificado} $us | {prod:5.1f} Bs.\n50%: {producto.mayorista} $us | {mayo:5.1f} Bs.\nCliente:\n$us: {producto.cliente_sus} | Bs: {producto.cliente_bs}"""
+    except:
+        pass
         
     bot.send_message(message.chat.id, msg)
 

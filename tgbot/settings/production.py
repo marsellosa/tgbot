@@ -27,7 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SECRET_KEY = config('SECRET_KEY', '0rk8u5wk=gav4dn@mw^p@c22-j^_gcg6s@-=jwxeo6j94@)pyh') 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.path.exists('db.sqlite3')
 
 # Application definition
 
