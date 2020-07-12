@@ -1,5 +1,7 @@
 # import os
+from django.shortcuts import render
 from decouple import config
+from django.contrib.admin.views.decorators import staff_member_required
 from rest_framework.response import Response
 from rest_framework.views import  APIView
 from .models import User
@@ -74,3 +76,10 @@ def send_Message(message):
         
     bot.send_message(message.chat.id, msg)
 
+@staff_member_required
+def update_db_view(request):
+    page_name = 'apps/bot/update.html'
+    context = {}
+
+    return render(request, page_name, context)
+    
