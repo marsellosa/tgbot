@@ -2,7 +2,7 @@ from django.db import models
 
 class Categoria(models.Model):
 
-    nombre = models.CharField(max_length=150)
+    nombre = models.CharField(max_length=150, unique=True)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.IntegerField(default=1)
     puntos_volumen = models.FloatField(max_length=10)
