@@ -11,12 +11,12 @@ def update_db_view(request):
     }
 
     if request.method == 'GET':
-        context = {
-            'msg':'Solo Archivos *.CSV'
-        }
-        return render(request, page_name, context)
+        return render(request, page_name, {'msg':'Solo Archivos *.CSV'})
 
     csv_file = request.FILES['file']
+    if not csv_file.name.endswith('.csv'):
+        return render(request, page_name, {'msg':'Formato de Archivo NO VALIDO'})
+        
     file = io.TextIOWrapper(csv_file)
     reader = csv.DictReader(file)
 
