@@ -64,7 +64,7 @@ def send_Message(message):
     # print(message)
     # msg = text
     try:
-        producto = Categoria.objects.get(nombre__iexact=text)
+        producto = Categoria.objects.get(nombre__iexact=text, activo=True)
         dist = float(producto.distribuidor) * tc
         cons = float(producto.consultor_mayor) * tc
         prod = float(producto.productor_calificado) * tc

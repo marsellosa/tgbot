@@ -22,3 +22,15 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+class Sabor(models.Model):
+
+    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True)
+    sabor = models.CharField(max_length=64)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = 'Sabores'
+
+    def __str__(self):
+        return self.sabor
+    
