@@ -2,7 +2,7 @@ from django.db import models
 
 class Categoria(models.Model):
 
-    nombre = models.CharField(max_length=150, unique=True)
+    nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.IntegerField(default=1)
     puntos_volumen = models.FloatField(max_length=10)
@@ -12,6 +12,7 @@ class Categoria(models.Model):
     mayorista = models.FloatField(max_length=10)
     cliente_bs = models.FloatField(max_length=10)
     cliente_sus = models.FloatField(max_length=10)
+    pais = models.ForeignKey('Pais', on_delete=models.SET_NULL, null=True, blank=True)
     activo = models.BooleanField(default=True)
     inserted_on = models.DateField(auto_now_add=True)
     edited_on = models.DateField(auto_now=True)
@@ -34,3 +35,12 @@ class Sabor(models.Model):
     def __str__(self):
         return self.sabor
     
+class Pais(models.Model):
+
+    nombre = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        verbose_name_plural = 'Paises'
+
+    def __str__(self):
+        return self.nombre

@@ -4,6 +4,7 @@ from decouple import config
 from rest_framework.response import Response
 from rest_framework.views import  APIView
 from .models import User
+from .chat import respond
 from ..registros.productos.models import Categoria
 
 import telebot
@@ -19,9 +20,26 @@ class UpdateBot(APIView):
 
         return Response({'code': 200})
 
+def save_new_user(message):
+    nombre = message.chat.first_name if not None else '!!'
+    # msg = f'Hola {nombre}!, usa el link /start, para tener mas información'
+    usr = message.chat
+    user = User()        
+    user.user_id = usr.id
+    user.first_name = usr.first_name
+    user.last_name = usr.last_name
+    user.username = usr.username
+    user.save()
+    msg = f'Hola {nombre}!, te doy la bienvenida, estoy aca para ayudarte.'
+    return msg
 
 @bot.message_handler(commands=['ayuda'])
 def ayuda(message):
+    start(message)
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    # Dibuja los botones
     cols = 2
     key = ReplyKeyboardMarkup(row_width=cols, resize_keyboard=True, one_time_keyboard=True)
     queryset = Categoria.objects.filter(activo=True)
@@ -40,29 +58,30 @@ def ayuda(message):
     if impar:
         key.row(str(queryset[i]))
 
-    msg = "Esta es la lista de productos que tengo de Bolivia"
-    bot.send_message(message.chat.id, msg, reply_markup=key)
+    # Da la bienvenida y verifica registro
+    nombre = message.chat.first_name if not None else '!!'
+    msg = f"Hola {nombre}! En la parte inferior veras botones con los nombres de todos los productos que tengo registrados de Herbalife Bolivia, presionalos y te daré algunos datos que tengo sobre ellos. Saludos! :)"
+    user_id = message.chat.id
+    if not User.objects.filter(user_id=user_id).exists():
+        save_new_user(message)
+
+    bot.send_message(user_id, msg, reply_markup=key)
 
 @bot.message_handler(content_types='text')
-def send_Message(message):
-    tc = 6.96
-    user_id = message.chat.id
-    nombre = message.chat.first_name if not None else '!'
-    msg = f'Hola {nombre}!, usa el link /ayuda, para tener mas información'
-
-    if not User.objects.filter(user_id=user_id).exists():
-        user = User()        
-        user.user_id = message.chat.id
-        user.first_name = message.chat.first_name
-        user.last_name = message.chat.last_name
-        user.username = message.chat.username
-        user.save()
-
+def send_message(message):
         
+    # verifica el registro
+    user_id = message.chat.id
+    if not User.objects.filter(user_id=user_id).exists():
+        save_new_user(message)
+
+    # escoge un mensaje aleatorio
+    msg = respond(message)
+
+    # calcula y envia el precio del producto solicitado
+    tc = 6.96
     text = message.text
-    # new_member = message.new_chat_members
-    # print(message)
-    # msg = text
+
     try:
         producto = Categoria.objects.get(nombre__iexact=text, activo=True)
         dist = float(producto.distribuidor) * tc
@@ -73,7 +92,7 @@ def send_Message(message):
     except:
         pass
         
-    bot.send_message(message.chat.id, msg)
+    bot.send_message(user_id, msg)
 
 
     
