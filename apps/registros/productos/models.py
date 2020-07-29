@@ -44,3 +44,20 @@ class Pais(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class Detalles(models.Model):
+
+    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True)
+    sku = models.CharField(max_length=8)
+    detalles = models.CharField(max_length=255, blank=True, null=True)
+    codigo_barras = models.CharField(max_length=16, blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    
+    class Meta:
+        managed = True
+        verbose_name = 'Detalle:'
+        verbose_name_plural = 'Detalles:'
+
+    def __str__(self):
+        return self.sku
+    
