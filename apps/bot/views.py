@@ -87,7 +87,7 @@ def send_message(message):
 
     # calcula y envia el precio del producto solicitado
     dolar = Settings.objects.get(nombre='Dolar')
-    tc = int(dolar.valor)
+    tc = float(dolar.valor)
     text = message.text
 
     try:
