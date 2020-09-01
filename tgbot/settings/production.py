@@ -17,14 +17,16 @@ from decouple import config
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', '0rk8u5wk=gav4dn@mw^p@c22-j^_gcg6s@-=jwxeo6j94@)pyh') 
+SECRET_KEY = config(
+    'SECRET_KEY', '0rk8u5wk=gav4dn@mw^p@c22-j^_gcg6s@-=jwxeo6j94@)pyh')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.path.exists('db.sqlite3')
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     #
+    'admin_auto_filters',
     'rest_framework',
     #
     'apps.bot',
@@ -79,8 +82,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tgbot.wsgi.application'
 
 if DEBUG:
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+    # Database
+    # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
     ALLOWED_HOSTS = ['*']
     DATABASES = {
         'default': {
@@ -90,12 +93,11 @@ if DEBUG:
     }
 else:
     import dj_database_url
-    from decouple import config
 
     ALLOWED_HOSTS = ['mi-asistente-herbalife.herokuapp.com']
     DATABASES = {
         'default': dj_database_url.config(
-            default = config('DATABASE_URL')
+            default=config('DATABASE_URL')
         )
     }
 
