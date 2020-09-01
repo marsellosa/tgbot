@@ -67,5 +67,3 @@ db.sqlite3
 .env
 logs/*.log
 set_webhook.sh
-Pipfile
-Pipfile.lock
