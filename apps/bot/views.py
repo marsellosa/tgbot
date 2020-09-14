@@ -26,12 +26,15 @@ class UpdateBot(APIView):
 def save_new_user(message):
     nombre = message.chat.first_name if not None else '!!'
     # msg = f'Hola {nombre}!, usa el link /start, para tener mas información'
-    usr = message.chat
+    from_user = message.from_user
+    # print(from_user.id)
     user = User()
-    user.user_id = usr.id
-    user.first_name = usr.first_name
-    user.last_name = usr.last_name
-    user.username = usr.username
+    user.user_id = from_user.id
+    user.first_name = from_user.first_name
+    user.last_name = from_user.last_name
+    user.username = from_user.username
+    user.is_bot = from_user.is_bot
+    user.language_code = from_user.language_code
     user.save()
     msg = f'Hola {nombre}!, te doy la bienvenida, estoy aca para ayudarte.'
     return msg
@@ -48,7 +51,7 @@ def start(message):
     cols = 2
     key = ReplyKeyboardMarkup(
         row_width=cols, resize_keyboard=True, one_time_keyboard=True)
-    queryset = Categoria.objects.filter(activo=True)
+    queryset = Categoria.objects.filter(activo=True).order_by('nombre')
     nro_items = queryset.count()
     vueltas = int(nro_items//cols)
     impar = True if nro_items % cols > 0 else False
@@ -66,7 +69,7 @@ def start(message):
 
     # Da la bienvenida y verifica registro
     nombre = message.chat.first_name if not None else '!!'
-    msg = f"Hola {nombre}! En la parte inferior veras botones con los nombres de todos los productos que tengo registrados de Herbalife Bolivia, presionalos y te daré algunos datos que tengo sobre ellos. Saludos! :)"
+    msg = f"Hola {nombre}! En la parte inferior veras botones con los nombres de todos los productos que tengo registrados de Herbalife Bolivia, presionalos y te daré algunos datos que tengo sobre ellos. Saludos! \U00002716"
     user_id = message.chat.id
     if not User.objects.filter(user_id=user_id).exists():
         save_new_user(message)
@@ -76,7 +79,7 @@ def start(message):
 
 @bot.message_handler(content_types='text')
 def send_message(message):
-
+    
     # verifica el registro
     user_id = message.chat.id
     if not User.objects.filter(user_id=user_id).exists():
