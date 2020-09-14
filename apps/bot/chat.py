@@ -23,17 +23,36 @@ rules = {
         'Me cuesta acordarme {0}'
     ],
     'default': [
-        'Como Jim Rohn nos enseñó, para que las cosas cambien, tú tienes que cambiar.\nhazme otra pregunta.',
-        '{0}, es un nombre que impone respeto, me gusta!'
+        'Como Jim Rohn nos enseñó, para que las cosas cambien, tú tienes que cambiar.\nhazme otra pregunta o escribe /ayuda',
+        '{0}, es un nombre que impone respeto, me gusta! escribe /ayuda para saber sobre los productos'
     ]
 }
 
+welcome_msg_options = {
+    "es": "Hola {0}! En la parte inferior veras botones con los nombres de todos los productos que tengo registrados de Herbalife Bolivia, presiónalos y te daré algunos datos que tengo sobre ellos. Saludos! \U0001F603",
+    "en": "Hi {0}! At the bottom you will see buttons with the names of all the products that I have registered from Herbalife Bolivia, press them and I will give you some information that I have about them. Regards! Привет, \U0001F603",
+    "ru": "Привет, {0}! Внизу вы увидите кнопки с названиями всех продуктов, которые я зарегистрировал в Herbalife Bolivia. Нажмите на них, и я дам вам некоторую информацию о них. С уважением! \U0001F603"
+}
+
+def select_language(message):
+    name = message.from_user.first_name if not None else '!!'
+    try:
+        msg = welcome_msg_options[message.from_user.language_code]
+    except:
+        msg = "Hi {0}! At the bottom you will see buttons with the names of all the products that I have registered from Herbalife Bolivia, press them and I will give you some information that I have about them. Regards!"
+    welcome_msg = msg.format(name)
+    return welcome_msg
+
+
+def welcome(message):
+    welcome_msg = select_language(message)
+    return welcome_msg
 # Define match_rule()
 
 
 def match_rule(rules, message):
     response = random.choice(rules['default'])
-    nombre = message.chat.first_name if not None else '!!'
+    nombre = message.from_user.first_name if not None else '!!'
     # Iterate over the rules dictionary
     text = message.text
     for pattern, responses in rules.items():
@@ -140,3 +159,4 @@ def replace_pronouns(message):
         return re.sub('you', 'me', message)
 
     return message
+

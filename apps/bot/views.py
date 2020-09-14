@@ -4,7 +4,7 @@ from decouple import config
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User
-from .chat import respond
+from .chat import respond, welcome
 from ..registros.productos.models import Categoria
 from ..main.models import Settings
 
@@ -68,9 +68,9 @@ def start(message):
         key.row(str(queryset[i]))
 
     # Da la bienvenida y verifica registro
-    nombre = message.chat.first_name if not None else '!!'
-    msg = f"Hola {nombre}! En la parte inferior veras botones con los nombres de todos los productos que tengo registrados de Herbalife Bolivia, presionalos y te daré algunos datos que tengo sobre ellos. Saludos! \U00002716"
-    user_id = message.chat.id
+    # nombre = message.from_user.first_name if not None else '!!'
+    msg = welcome(message)
+    user_id = message.from_user.id
     if not User.objects.filter(user_id=user_id).exists():
         save_new_user(message)
 
@@ -85,9 +85,6 @@ def send_message(message):
     if not User.objects.filter(user_id=user_id).exists():
         save_new_user(message)
 
-    # escoge un mensaje aleatorio
-    msg = respond(message)
-
     # calcula y envia el precio del producto solicitado
     dolar = Settings.objects.get(nombre='Dolar')
     tc = float(dolar.valor)
@@ -101,6 +98,7 @@ def send_message(message):
         mayo = float(producto.mayorista) * tc
         msg = f"""{producto.descripcion}:\nCantidad: {producto.cantidad}\nPV: {producto.puntos_volumen}\n25%: {producto.distribuidor} $us | {dist:5.1f} Bs.\n35%: {producto.consultor_mayor} $us | {cons:5.1f} Bs.\n42%: {producto.productor_calificado} $us | {prod:5.1f} Bs.\n50%: {producto.mayorista} $us | {mayo:5.1f} Bs.\nCliente:\n$us: {producto.cliente_sus} | Bs: {producto.cliente_bs}"""
     except:
-        pass
+        # escoge un mensaje aleatorio
+        msg = respond(message)
 
     bot.send_message(user_id, msg)
