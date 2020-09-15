@@ -1,10 +1,6 @@
 from django.contrib import admin
-<<<<<<< HEAD
 from .models import Categoria, Sabor, Pais
 from admin_auto_filters.filters import AutocompleteFilter
-=======
-from .models import Categoria, Sabor, Pais, Detalles
->>>>>>> b70831aff05c88067f3dbe4529bca390daf2b327
 
 
 class CategoriaFilter(AutocompleteFilter):
