@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Categoria, Sabor, Pais
+from .models import Categoria, Sabor, Pais, Detalles
 from admin_auto_filters.filters import AutocompleteFilter
 
 
