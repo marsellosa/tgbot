@@ -11,3 +11,15 @@ class User(models.Model):
 
     def __str__(self):
         return self.user_id
+
+class Activity(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    text = models.CharField(max_length=255, blank=True, null=True)
+    inserted_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Activities'
+
+    def __str__(self):
+        return str(self.user)
+    

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from decouple import config
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import User
+from .models import User, Activity
 from .chat import respond, welcome
 from ..registros.productos.models import Categoria
 from ..main.models import Settings
@@ -24,7 +24,7 @@ class UpdateBot(APIView):
 
 
 def save_new_user(message):
-    nombre = message.chat.first_name if not None else '!!'
+    # nombre = message.chat.first_name if not None else '!!'
     # msg = f'Hola {nombre}!, usa el link /start, para tener mas información'
     from_user = message.from_user
     # print(from_user.id)
@@ -36,8 +36,8 @@ def save_new_user(message):
     user.is_bot = from_user.is_bot
     user.language_code = from_user.language_code
     user.save()
-    msg = f'Hola {nombre}!, te doy la bienvenida, estoy aca para ayudarte.'
-    return msg
+    # msg = f'Hola {nombre}!, te doy la bienvenida, estoy aca para ayudarte.'
+    return User.objects.get(user_id=from_user.id)
 
 
 @bot.message_handler(commands=['ayuda'])
@@ -67,29 +67,39 @@ def start(message):
     if impar:
         key.row(str(queryset[i]))
 
-    # Da la bienvenida y verifica registro
-    # nombre = message.from_user.first_name if not None else '!!'
+    # Solicita un saludo segun el idioma
     msg = welcome(message)
+    # 
     user_id = message.from_user.id
+    # Verifica el registro
     if not User.objects.filter(user_id=user_id).exists():
         save_new_user(message)
-
+    # Envia una respuesta
     bot.send_message(user_id, msg, reply_markup=key)
 
 
 @bot.message_handler(content_types='text')
 def send_message(message):
-    
-    # verifica el registro
-    user_id = message.chat.id
-    if not User.objects.filter(user_id=user_id).exists():
-        save_new_user(message)
+    # Verifica el registro
+    try:
+        user_id = User.objects.get(user_id=message.from_user.id)
+    except:
+        user_id = save_new_user(message)
+
+    # Capturamos el texto solicitado por el usuario
+    text = message.text
+
+    # Registramos la actividad del usuario
+    log = Activity()
+    log.user = user_id
+    log.text = text
+    log.save()
 
     # calcula y envia el precio del producto solicitado
     dolar = Settings.objects.get(nombre='Dolar')
     tc = float(dolar.valor)
-    text = message.text
-
+    
+    # Procesamos la respuesta al usurio
     try:
         producto = Categoria.objects.get(nombre__iexact=text, activo=True)
         dist = float(producto.distribuidor) * tc
@@ -101,4 +111,5 @@ def send_message(message):
         # escoge un mensaje aleatorio
         msg = respond(message)
 
+    # Enviamos el mensaje
     bot.send_message(user_id, msg)
