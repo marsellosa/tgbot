@@ -24,10 +24,9 @@ class UpdateBot(APIView):
 
 
 def save_new_user(message):
-    # nombre = message.chat.first_name if not None else '!!'
-    # msg = f'Hola {nombre}!, usa el link /start, para tener mas información'
+
     from_user = message.from_user
-    # print(from_user.id)
+ 
     user = User()
     user.user_id = from_user.id
     user.first_name = from_user.first_name
@@ -36,7 +35,7 @@ def save_new_user(message):
     user.is_bot = from_user.is_bot
     user.language_code = from_user.language_code
     user.save()
-    # msg = f'Hola {nombre}!, te doy la bienvenida, estoy aca para ayudarte.'
+
     return User.objects.get(user_id=from_user.id)
 
 

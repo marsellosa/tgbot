@@ -10,17 +10,26 @@ bot_template = "BOT : {0}"
 user_template = "USER : {0}"
 
 rules = {
-    'Hola (.*)': [
+    'hola (.*)': [
         'Hola {0}!,\nte doy la bienvenida, estoy aca para ayudarte.',
         'Hola {0}!,\nmis respuestas son limitadas, asi que has las preguntas correctas.'
     ],
-    'STS': [
+    'hola': [
+        'Hola {0}!,\nTe doy la bienvenida, estoy aca para ayudarte.',
+        'Hola {0}!,\nMis respuestas son limitadas, asi que has las preguntas correctas.'
+    ],
+    'sts': [
         '¿Por que quieres saber donde es el STS {0}?',
         '¿Para que quieres {0}?'
     ],
-    'Te acuerdas (.*)': [
-        'Claro que me acuerdo {0}, por?',
-        'Me cuesta acordarme {0}'
+    'gracias': [
+        'Gracias a ti por confiar en mi {0}',
+        'Es un gusto poder ayudarte {0}',
+        'Estaré aqui cuando me necesites {0}'
+    ],
+    'te acuerdas (.*)': [
+        'Claro que me acuerdo {0}, me da gusto saber de ti!',
+        'Lo siento, pero me cuesta acordarme {0}'
     ],
     'default': [
         'La vida es una combinación única entre "querer hacer" y "cómo hacerlo", y necesitamos darle atención por igual a los dos',
@@ -41,7 +50,7 @@ def select_language(message):
     try:
         msg = welcome_msg_options[message.from_user.language_code]
     except:
-        msg = "Hi {0}! At the bottom you will see buttons with the names of all the products that I have registered from Herbalife Bolivia, press them and I will give you some information that I have about them. Regards! \U0001F603"
+        msg = welcome_msg_options["es"]
     welcome_msg = msg.format(name)
     return welcome_msg
 
@@ -59,13 +68,13 @@ def match_rule(rules, message):
     text = message.text
     for pattern, responses in rules.items():
         # Create a match object
-        match = re.search(pattern, text)
+        match = re.search(pattern, text.lower())
         if match is not None:
             # Choose a random response
             response = random.choice(responses)
             break
     if '{0}' in response:
-        response = response.format(nombre)
+        response = response.format(nombre.capitalize())
 
     # Return the response and phrase
     return response
