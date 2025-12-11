@@ -23,20 +23,19 @@ class UpdateBot(APIView):
         return Response({'code': 200})
 
 
-def save_new_user(message):
-
+def get_or_create_user(message):
     from_user = message.from_user
- 
-    user = User()
-    user.user_id = from_user.id
-    user.first_name = from_user.first_name
-    user.last_name = from_user.last_name
-    user.username = from_user.username
-    user.is_bot = from_user.is_bot
-    user.language_code = from_user.language_code
-    user.save()
-
-    return User.objects.get(user_id=from_user.id)
+    user, created = User.objects.get_or_create(
+        user_id=from_user.id,
+        defaults={
+            'first_name': from_user.first_name,
+            'last_name': from_user.last_name,
+            'username': from_user.username,
+            'is_bot': from_user.is_bot,
+            'language_code': from_user.language_code,
+        }
+    )
+    return user
 
 
 @bot.message_handler(commands=['ayuda'])
@@ -69,28 +68,21 @@ def start(message):
     # Solicita un saludo segun el idioma
     msg = welcome(message)
     # 
-    user_id = message.from_user.id
-    # Verifica el registro
-    if not User.objects.filter(user_id=user_id).exists():
-        save_new_user(message)
+    user = get_or_create_user(message)
     # Envia una respuesta
-    bot.send_message(user_id, msg, reply_markup=key)
+    bot.send_message(user.user_id, msg, reply_markup=key)
 
 
 @bot.message_handler(content_types='text')
 def send_message(message):
-    # Verifica el registro
-    try:
-        user_id = User.objects.get(user_id=message.from_user.id)
-    except:
-        user_id = save_new_user(message)
+    user = get_or_create_user(message)
 
     # Capturamos el texto solicitado por el usuario
     text = message.text
 
     # Registramos la actividad del usuario
     log = Activity()
-    log.user = user_id
+    log.user = user
     log.text = text
     log.save()
 
@@ -111,4 +103,4 @@ def send_message(message):
         msg = respond(message)
 
     # Enviamos el mensaje
-    bot.send_message(user_id, msg)
+    bot.send_message(user.user_id, msg)
